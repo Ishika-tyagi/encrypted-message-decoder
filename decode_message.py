@@ -1,6 +1,7 @@
 from functools import lru_cache
 
-letter_to_code = {
+# Mapping letters to encrypted form
+codes = {
     'A': '._',   'B': '_...', 'C': '_._.', 'D': '_..',  'E': '.',
     'F': '.._.', 'G': '__.',  'H': '....', 'I': '..',   'J': '.___',
     'K': '_._',  'L': '._..', 'M': '__',   'N': '_.',   'O': '___',
@@ -9,24 +10,31 @@ letter_to_code = {
     'Y': '_.__', 'Z': '__..'
 }
 
-code_to_letters = {}
-for letter, code in letter_to_code.items():
-    code_to_letters.setdefault(code, []).append(letter)
+# Reverse map
+decode_map = {}
+for ch, pattern in codes.items():
+    if pattern not in decode_map:
+        decode_map[pattern] = []
+    decode_map[pattern].append(ch)
 
 encrypted = input().strip()
+max_len = max(len(p) for p in decode_map)
 
 @lru_cache(None)
-def decode(index):
-    if index == len(encrypted):
+def solve(pos):
+    if pos == len(encrypted):
         return [""]
 
-    result = []
-    for code, letters in code_to_letters.items():
-        if encrypted.startswith(code, index):
-            for suffix in decode(index + len(code)):
-                for letter in letters:
-                    result.append(letter + suffix)
-    return result
+    words = []
+    for length in range(1, max_len + 1):
+        part = encrypted[pos:pos + length]
+        if part in decode_map:
+            for letter in decode_map[part]:
+                for tail in solve(pos + length):
+                    words.append(letter + tail)
+    return words
 
-for word in sorted(decode(0)):
-    print(word)
+result = solve(0)
+
+for w in sorted(result):
+    print(w)
