@@ -10,7 +10,6 @@ codes = {
     'Y': '_.__', 'Z': '__..'
 }
 
-# Reverse map
 decode_map = {}
 for ch, pattern in codes.items():
     if pattern not in decode_map:
